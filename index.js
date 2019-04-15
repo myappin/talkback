@@ -315,7 +315,10 @@ var FallbackMode = {
 };
 FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY];
 var defaultOptions = {
-  cookie: null,
+  cookie: {
+    name: null,
+    value: null
+  },
   port: 8080,
   path: "./tapes/",
   record: RecordMode.NEW,
@@ -584,7 +587,7 @@ function () {
             switch (_context3.prev = _context3.next) {
               case 0:
                 method = req.method, url = req.url, body = req.body;
-                headers = _objectSpread({}, req.headers, this.addCookie(req.headers, this.options.cookie));
+                headers = _objectSpread({}, req.headers, this.addCookie(req.headers, this.options.cookie.name, this.options.cookie.value));
                 delete headers.host;
                 host = this.options.host;
                 this.options.logger.log("Making real request to ".concat(host).concat(url));
@@ -631,14 +634,18 @@ function () {
     }()
   }, {
     key: "addCookie",
-    value: function addCookie(headers, cookieValue) {
-      var cookie;
+    value: function addCookie(headers, cookieName, cookieValue) {
+      var cookie = headers && headers.cookie;
 
-      if (cookieValue) {
-        if (headers && headers.cookie) {
-          cookie = "".concat(headers.cookie, "; ").concat(cookieValue);
+      if (cookieName && cookieValue) {
+        var cookieNameAndValue = "".concat(cookieName, "=").concat(cookieValue);
+
+        if (cookie && cookie.indexOf(cookieName) > -1) {
+          cookie = cookie;
+        } else if (cookie) {
+          cookie = "".concat(headers.cookie, "; ").concat(cookieNameAndValue);
         } else {
-          cookie = cookieValue;
+          cookie = cookieNameAndValue;
         }
 
         return {
