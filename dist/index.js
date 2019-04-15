@@ -315,6 +315,7 @@ var FallbackMode = {
 };
 FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY];
 var defaultOptions = {
+  cookie: null,
   port: 8080,
   path: "./tapes/",
   record: RecordMode.NEW,
@@ -583,7 +584,7 @@ function () {
             switch (_context3.prev = _context3.next) {
               case 0:
                 method = req.method, url = req.url, body = req.body;
-                headers = _objectSpread({}, req.headers);
+                headers = _objectSpread({}, req.headers, this.addCookie(req.headers, this.options.cookie));
                 delete headers.host;
                 host = this.options.host;
                 this.options.logger.log("Making real request to ".concat(host).concat(url));
@@ -628,6 +629,25 @@ function () {
 
       return makeRealRequest;
     }()
+  }, {
+    key: "addCookie",
+    value: function addCookie(headers, cookieValue) {
+      var cookie;
+
+      if (cookieValue) {
+        if (headers && headers.cookie) {
+          cookie = "".concat(headers.cookie, "; ").concat(cookieValue);
+        } else {
+          cookie = cookieValue;
+        }
+
+        return {
+          cookie: cookie
+        };
+      } else {
+        return {};
+      }
+    }
   }]);
 
   return RequestHandler;

@@ -77,7 +77,7 @@ export default class RequestHandler {
 
   async makeRealRequest(req) {
     let {method, url, body} = req
-    const headers = {...req.headers}
+    const headers = {...req.headers, ...this.addCookie(req.headers, this.options.cookie)}
     delete headers.host
 
     const host = this.options.host
@@ -93,6 +93,25 @@ export default class RequestHandler {
       status: fRes.status,
       headers: fRes.headers.raw(),
       body: buff
+    }
+  }
+
+  addCookie(headers, cookieValue) {
+    let cookie;
+
+    if (cookieValue) {
+      if (
+          headers &&
+          headers.cookie
+      ) {
+        cookie = `${headers.cookie}; ${cookieValue}`;
+      } else {
+        cookie = cookieValue;
+      }
+
+      return {cookie};
+    } else {
+      return {};
     }
   }
 }
